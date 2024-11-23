@@ -8,7 +8,7 @@ import pseudoslam.envs.simulator.jsonReader as jsonReader
 
 import time
 
-map_color= {'uncertain':-101, 'free':0, 'obstacle':100}
+map_color= {'uncertain':127, 'free':0, 'obstacle':255}
 move_choice= {'forward':np.array([1,0]), 'left': np.array([0,1]), 'right': np.array([0,-1])}
 
 class pseudoSlam():

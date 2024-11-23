@@ -3,14 +3,14 @@ import cv2, time
 from os import path
 from matplotlib import pyplot as plt
 
-import gym
-from gym import spaces
-from gym.utils import seeding
+import gymnasium as gym
+from gymnasium import spaces
+from gymnasium.utils import seeding
 
 from pseudoslam.envs.simulator.pseudoSlam import pseudoSlam
 
 class RobotExplorationT0(gym.Env):
-    def __init__(self, config_path='config.yaml'):
+    def __init__(self, render_mode="human", config_path='config.yaml'):
         if config_path.startswith("/"):
             fullpath = config_path
         else:
@@ -18,17 +18,24 @@ class RobotExplorationT0(gym.Env):
         if not path.exists(fullpath):
             raise IOError("File %s does not exist" % fullpath)
 
+        self.render_mode = render_mode
         self.sim = pseudoSlam(fullpath)
         self.action_space = self._get_action_space()
         self.observation_space = self._get_observation_space()
         self.last_map = self.sim.get_state()
         self.last_action = None
+        self.metadata = {
+                "render_modes": ["rgb_array", "human"]
+                }
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def render(self, mode='human'):
+    def render(self, mode=''):
+        if mode == '':
+            mode = self.render_mode
+
         slamMap = self._get_obs()[:,:,0]
         if mode == "human":
             plt.figure(0)
@@ -38,15 +45,17 @@ class RobotExplorationT0(gym.Env):
             plt.pause(0.00001)
         elif mode == "rgb_array":
             obs = np.expand_dims(slamMap, -1).repeat(3, -1)
-            obs += 101  # convert to [0,255]
+            # not necessary anymore:
+            # obs += 101  # convert to [0,255]
             obs = obs.astype(np.uint8)
             return obs
 
-    def reset(self, order=False):
+    def reset(self, order=False, seed=None):
+        self.seed(seed)
         self.sim.reset(order)
         self.last_map = self.sim.get_state()
         self.last_action = None
-        return self._get_obs()
+        return self._get_obs(), {}
 
     def step(self, action):
         action = int(action)
@@ -59,8 +68,7 @@ class RobotExplorationT0(gym.Env):
         done = (self.sim.measure_ratio() > 0.95)
         info = {'is_success': done}
 
-        return obs, reward, done, info
-
+        return obs, reward, done, False, info
 
     def close(self):
         pass
@@ -83,7 +91,7 @@ class RobotExplorationT0(gym.Env):
 
     def _get_observation_space(self):
         obs = self._get_obs()
-        observation_space = spaces.Box(-np.inf, np.inf, shape=obs.shape, dtype='float32')
+        observation_space = spaces.Box(0, 255, shape=obs.shape, dtype='uint8')
         return observation_space
 
     def _get_obs(self):
@@ -129,7 +137,8 @@ class RobotExplorationT0(gym.Env):
                       (int(state_size_y / 2.) + int(self.sim.robotRadius),
                        int(state_size_x / 2.) + int(self.sim.robotRadius)),
                       50, -1)
-        return dst.copy()
+
+        return dst.copy().astype(np.uint8)
 
 
 if __name__ == '__main__':

@@ -68,6 +68,7 @@ The code has been tested under
 - Start to train the model using baselines, for example, run
   ```
   python -m baselines.run --alg=ppo2 --env=RobotExploration-v0 --network=cnn --num_timesteps=2e7 --save_path=~/models/exploration_20M_ppo2 --save_interval=10 --log_path=~/logs/exploration --save_video_interval=10000
+  # python -m rl_zoo3.train --algo ppo --env RobotExploration-v0 --hyperparams=policy:\"stable_baselines3.common.policies.ActorCriticCnnPolicy\"  --hyperparams n_envs:64 -n 20000000 -P --vec-env subproc
   ```
 - After the training is finished, check your trained model by running
   ```

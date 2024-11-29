@@ -57,7 +57,7 @@ The code has been tested under
   ```
   
 ## Training Models
-- One Gym-compatible environment of robot exploration has been implemented. To train a model using OpenAI baselines, first install OpenAI Gym and Baselines. Then add our environment in Gym by registering in `/gym/envs/__init__.py`:
+- One Gym-compatible environment of robot exploration has been implemented. To train a model using rl-baselines3-zoo, first install Gymnasium, stable_baselines3 and rl-baselines3-zoo. Then add our environment in Gymnasium by registering in `/gymnasium/envs/__init__.py`:
   ```
   register(
       id='RobotExploration-v0',
@@ -65,12 +65,28 @@ The code has been tested under
       max_episode_steps=200,
   )
   ```
+- rl-baselines3-zoo needs default hyperparameters for training. The following hyperparams are copied from OpenAI' baselines. These can be added in `/rl_zoo3/hyperparams/ppo.yml`:
+  ```
+  RobotExploration-v0:
+    n_envs: 64
+    n_timesteps: 20000000
+    policy: 'CnnPolicy'
+    n_steps: 200
+    gae_lambda: 0.95
+    gamma: 0.99
+    n_epochs: 10
+    batch_size: 256
+    ent_coef: 0.0
+    learning_rate: !!float 3e-4
+    clip_range: 0.2
+    use_sde: False
+    sde_sample_freq: 4
+  ```
 - Start to train the model using baselines, for example, run
   ```
-  python -m baselines.run --alg=ppo2 --env=RobotExploration-v0 --network=cnn --num_timesteps=2e7 --save_path=~/models/exploration_20M_ppo2 --save_interval=10 --log_path=~/logs/exploration --save_video_interval=10000
-  # python -m rl_zoo3.train --algo ppo --env RobotExploration-v0 --hyperparams=policy:\"stable_baselines3.common.policies.ActorCriticCnnPolicy\"  --hyperparams n_envs:64 -n 20000000 -P --vec-env subproc
+  python -m rl_zoo3.train --algo ppo --env RobotExploration-v0 -P --vec-env subproc
   ```
-- After the training is finished, check your trained model by running
+- In the old baslines you could, check your trained model by running
   ```
   python -m baselines.run --alg=ppo2 --env=RobotExploration-v0 --network=cnn --num_timesteps=0 --load_path=~/models/exploration_20M_ppo2 --play
   ```

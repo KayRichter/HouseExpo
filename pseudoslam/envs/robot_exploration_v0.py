@@ -50,7 +50,7 @@ class RobotExplorationT0(gym.Env):
             obs = obs.astype(np.uint8)
             return obs
 
-    def reset(self, order=False, seed=None):
+    def reset(self, order=False, seed=None, options=None):
         self.seed(seed)
         self.sim.reset(order)
         self.last_map = self.sim.get_state()

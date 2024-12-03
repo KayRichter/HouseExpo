@@ -20,9 +20,9 @@ PseudoSLAM is a high-speed OpenAI Gym-compatible simulation platform that simula
 
 ## Prerequisite
 The code has been tested under 
-* python 3.6
-* tensorflow 1.15
-* Ubuntu 16.04
+* python 3.11
+* torch 2.4
+* Linux Mint 20.03
 
 ## Getting Started
 - Clone the repo and cd into it:

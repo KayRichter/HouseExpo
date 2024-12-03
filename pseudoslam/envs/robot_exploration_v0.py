@@ -25,7 +25,8 @@ class RobotExplorationT0(gym.Env):
         self.last_map = self.sim.get_state()
         self.last_action = None
         self.metadata = {
-                "render_modes": ["rgb_array", "human"]
+                "render_modes": ["rgb_array", "human"],
+                "render_fps": 5
                 }
 
     def seed(self, seed=None):
